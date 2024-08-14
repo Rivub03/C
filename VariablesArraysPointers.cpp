@@ -1,4 +1,5 @@
-
+// This code demonstrates the different ways to pass arrays, variables as function parameters using pointers and the different ways to print arrays using a 
+// combination of pointers and subscript notation. 
 #include <iostream>
 #include <iomanip>
 using namespace std;
@@ -9,7 +10,7 @@ void printarray3(int[], int);
 void printarray4(int[], int);
 void printarray5(int[], int);
 void passByReference(int&);
-void passPointer(int*);
+void passPointer(int*); 
 void passPointerArray(int*, int);
 void passArray(int[], int);
 int* returningArray(int*, int);
@@ -25,16 +26,16 @@ int main() {
     array1 = new int[size1]; //Dynamic Memory Allocation
     array2 = new int[size2];
 
-    passPointerArray(array1, size1);
-    passArray(array2,size2);
-    printarray1(array1, size1);
-    printarray2(array2, size2);
-    printarray3(array1, size1);
-    printarray4(array2, size2);
-    printarray5(array1, size1);
+    passPointerArray(array1, size1); // One way of passing an array using pointers 
+    passArray(array2,size2); // One way of passing an array without using pointers 
+    printarray1(array1, size1); // passing array1 the old fashioned way again but using a different printing method
+    printarray2(array2, size2); // poassing array2 the old fashioned way again '' ' '' ' ' ' '
+    printarray3(array1, size1); // passing array1 ' ' ' ' ' ' ''  ' ' '
+    printarray4(array2, size2); // ditto
+    printarray5(array1, size1); // ditto 
 
-    returningArray(array1, size1);
-    printarray1(array1, size1);
+    returningArray(array1, size1); // returns array multiplied by 2. Maybe a new variable could catch it but not necessary. 
+    printarray1(array1, size1); // prints new array multiplied by 2
 
 
     delete[] array1;
@@ -43,7 +44,7 @@ int main() {
     return 0;
 }
 
-void passArray(int arr[], int size) {
+void passArray(int arr[], int size) { 
     for (int i = 0; i < size; i++) {
         cout << "Enter element " << (i + 1) << " : ";
         cin >> arr[i];
