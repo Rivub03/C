@@ -103,7 +103,7 @@ int fibonacci(int n) { // complexity O(2^n)
 	}
 }
 
-int power(int x, int y) { //
+int power(int x, int y) { // complexit O(n)
 	if (y == 0) {
 		return 1;
 	}
@@ -125,7 +125,7 @@ int gcd(int x, int y) { // complexity O(log n)
 	}
 }
 
-int reverseNumber(int num, int temp) {
+int reverseNumber(int num, int temp) { // time complexity O(d) where d is number of digits 
 	if (num == 0) {
 		return temp;
 	}
