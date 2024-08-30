@@ -157,15 +157,15 @@ void Delete_at(int n) {
         delete temp2; //freeing the memory by deleting the node 
     }
 }
-Node* ReverseIteratively(Node* head) {
+Node* ReverseIteratively(Node* head) {  
     Node* current, * prev, * next;
-    current = head;
+    current = head;                    
     prev = NULL;
     while (current != NULL) {
-        next = current->next;
-        current->next = prev;
-        prev = current;
-        current = next; 
+        next = current->next;  // next will be set to current->next always to keep track of what the next node is 
+        current->next = prev;     //The current node's link is set to the previous node as we are trying to reverse the list. at the first iteration this will be NULL and this is correct
+        prev = current;    // the previous node is set to current once the link has been adjusted
+        current = next;    // current node is set to the next node so that we can this process all over again in the next iteration of the while loop
     }
     head = prev;
     return head; 
@@ -183,11 +183,11 @@ void ReverseRecursion(Node* p) {
     
 }
 
-void PrintForwardRecursion(Node* p) {
-    if (p == NULL) {
+void PrintForwardRecursion(Node* p) { //usually will take head as input
+    if (p == NULL) {  //base case 
         return;
     }
-    cout << p->data;
+    cout << p->data; 
     PrintForwardRecursion(p->next);
 }
 
@@ -195,7 +195,7 @@ void PrintBackwardRecursion(Node* p) {
     if (p == NULL) {
         return;
     }
-    PrintBackwardRecursion(p->next);
+    PrintBackwardRecursion(p->next); //uses the stack property by placing this statement before the print statement to print backwards. 
     cout << p->data;
 
 }
