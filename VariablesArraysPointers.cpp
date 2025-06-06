@@ -17,6 +17,29 @@ int* returningArray(int*, int);
 
 int main() {
 
+    //basics of pointers
+    int amount;
+    cout << &amount << endl;
+
+    int JellyDonuts;
+    getOrder(JellyDonuts);
+    cout << JellyDonuts << endl;
+
+    int x = 25;
+    int* ptr;
+    ptr = &x;
+    cout << "The value of x is " << *ptr << endl;
+    cout << "The memory address of x is " << ptr << endl;
+    *ptr = 100; // changes the value of x since *ptr = x and ptr is pointing to x
+    cout << x << endl;
+    cout << *ptr << endl;
+    cout << ptr << endl; // memory address remains mostly unchanges since ptr = &x
+
+    
+    //Pointers and Arrays
+    short numbers[] = { 10,20,30,40,50 };
+    cout << *numbers << endl;
+
     int size1, size2, *array1, *array2;
     passByReference(size1); // the variable is passed by reference as argument which uses its memory location as parameter 
     passPointer(&size2); // variable's memory location is passed as argument which is caught by the pointer parameter
