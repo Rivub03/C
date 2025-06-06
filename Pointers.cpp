@@ -103,6 +103,55 @@ int main() {
 	cout << "Memory address of q/value of q:" << *r << endl;
 	cout << "Memmory address/value of p/" << *(*r) << endl;
 	cout << "Value of x1/***r: " << ***r << endl;
+	
+	//Dynamic Memory Allocation
+	int* iptr;
+	iptr = new int; // allocates memory for a new int. iptr will contain the address of this new variable
+	*iptr = 25;
+	cout << *iptr << endl;
+	delete iptr; // releasing or freeing memory
+
+	iptr = new int[100]; // 100 element array space being allocated. iptr[i] can then be used to access.
+	delete[] iptr; // releasing or deleting or freeing memory
+
+	double* sales1, total = 0, average;
+	int numDays, count;
+	cout << "How many days of sales figures do you wish to process?";
+	cin >> numDays;
+	sales1 = new double[numDays]; //dynamically allocates memory for an array of doubles
+	cout << "Enter sales figure below" << endl;
+	for (count = 0; count < numDays; count++) {
+		cout << "Day " << count + 1 << ":";
+		cin >> sales1[count];
+		total += sales[count];
+	}
+	average = total / numDays;
+	cout << "Average sales: $" << average << endl;
+	delete[] sales1;
+	sales1 = 0; // good practice to store 0 in a pointer variable after using delete on it
+
+	//Dynamically allocating a 2D array:
+	int rows, columns;
+	cout << "Enter rows: " << endl;
+	cin >> rows;
+	cout << "Enter columns: " << endl;
+	cin >> columns;
+	int** array;
+	array = new int* [rows];
+	for (int i = 0; i < rows; i++) {
+		array[i] = new int[columns];
+
+	}
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < rows; j++) {
+			cout << "Enter element [" << i << "][" << j << "]";
+			cin >> array[i][j];
+		}
+	}
+	for (int i = 0; i < rows; i++) {
+		delete[]array[i];
+	}
+	delete[]array;
 
 	// Returning pointers from functions
 	int* numbers1;
