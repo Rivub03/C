@@ -12,24 +12,25 @@ void message(int); // simple recursive function that has a base case and shows h
 int factorial(int); // simple recursive function that demonstrates base case and recursive case 
 int fibonacci(int); // another simple recursive function that demonstrates base case and recusrive case 
 int power(int, int); // recursive function to raise an integer to its exponent x^y
-int gcd(int,int); // dry run this code to see how it works
+int gcd(int, int); // dry run this code to see how it works
 int reverseNumber(int, int); //  reverses a given integer recursively
 bool isPalindrome(int);// checks if an integer is a palindrome or not non-recursively
 int isArrayInSortedOrder(int[], int n); // checks if a given 1D array is sorted recursively
+void moveDiscs(int, int, int, int); // The towers of Hanoi problem
 
 int main() {
 
 	message(5); // code for message
 	// code for factorial
-	cout << "factorial: " << factorial(100) << endl;
+	cout << "factorial: " << factorial(10) << endl;
 	int x;
 
 	//code for displaying the fibonacci sequence instead of just one number
 	cout << "enter the fibonacci numbers you want displayed: " << endl;
 	cin >> x;
-	cout << "the first " << x <<" fibonacci numbers are : " << endl;
+	cout << "the first " << x << " fibonacci numbers are : " << endl;
 	for (int i = 0; i < x; i++) {
-		cout << fibonacci(i) << ","; 
+		cout << fibonacci(i) << ",";
 	}
 	cout << endl;
 
@@ -56,7 +57,7 @@ int main() {
 
 	//code for sorted array
 	cout << "Enter the size of the array: " << endl;
-	int n, *array;
+	int n, * array;
 	cin >> n;
 	array = new int[n];
 	cout << "Enter array: " << endl;
@@ -66,12 +67,15 @@ int main() {
 	}
 	int a = isArrayInSortedOrder(array, n);
 	if (a == 0) {
-		cout << "False: Array is not soreted";
+		cout << "False: Array is not sorted";
 	}
 	else if (a == 1) {
 		cout << "True: Array is sorted";
 	}
 	cout << endl;
+
+	cout << "The towers of Hanoi problem with 5 discs and 3 pegs: " << endl;
+	moveDiscs(5, 1, 3, 2);
 
 	return 0;
 }
@@ -82,7 +86,7 @@ void message(int times) { // recursive will print 5 times, endline will print 6 
 		message(times - 1);
 	}
 	cout << "endline: " << times << endl; // at message(0) this line is reached for the first time. Each other call reaches this line one by one
-}	
+}
 
 int factorial(int n) { // complexity O(n)
 	if (n == 0) {
@@ -159,3 +163,11 @@ int isArrayInSortedOrder(int A[], int size) { // complexity O(n)
 		}
 	}
 }
+void moveDiscs(int num, int fromPeg, int toPeg, int tempPeg) {
+	if (num > 0) {
+		moveDiscs(num - 1, fromPeg, tempPeg, toPeg);
+		cout << "Move a disc from peg " << fromPeg << " to peg " << toPeg << endl;
+		moveDiscs(num - 1, tempPeg, toPeg, fromPeg);
+	}
+}
+
