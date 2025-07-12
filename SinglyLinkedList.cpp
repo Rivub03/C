@@ -17,7 +17,7 @@ struct Node {
 };
 
 Node* head;
-Node* tail = NULL;
+Node* tail = nullptr;
 
 
 void createBasicLinkedList(); //Linked List Basic Implementation of two nodes
@@ -69,32 +69,27 @@ int main() {
 }
 
 void createBasicLinkedList() {
-    head = NULL;
+    head = nullptr;
+    tail = nullptr;
 
     // Create the first node and point head to it
     Node* temp = new Node;
     temp->data = 2;
-    temp->next = NULL;
+    temp->next = nullptr;
     head = temp;
 
     // Create the second node
-    temp = new Node;
-    temp->data = 4;
-    temp->next = NULL;
-    tail = temp;
-
-    // Find the last node and link the new node to the end of the list
-    Node* temp1 = head;
-    while (temp1->next != NULL) { //reaches the last node of the list and exits during false check
-        temp1 = temp1->next; //traverses the entire list and reaches the last node 
-    }
-    temp1->next = temp;
-    tail = temp1->next;
+    Node *second = new Node;
+    second->data = 4;
+    second->next = nullptr;
+    head->next = second; 
+    tail = second;
+    
 
     // Print the entire linked list
-    temp1 = head;
-    while (temp1 != NULL) { // the previous while loop will need to be run again to print the last node. This is because in the temp->next loop, the loop will go to the last node and immediately exit. 
-        cout << temp1->data << " "; // this problem could've been overcome by having this line below temp1 = temp1->next
+    Node *temp1 = head;
+    while (temp1 != nullptr) { // the previous while loop will need to be run again to print the last node. This is because in the temp->next loop, the loop will go to the last node and immediately exit. 
+        cout << temp1->data << " "; // this problem could've been overcome by having this line below temp = temp->next
         temp1 = temp1->next;        // but that would make us skip the first element
     }
     cout << endl;
@@ -103,7 +98,7 @@ void createBasicLinkedList() {
 void Print() {
     Node* temp = head;
     cout << "List is: head->";
-    while (temp != NULL) {  //we use temp instead of temp->next here because that will make the fucntion skip the last element
+    while (temp != nullptr) {  //we use temp instead of temp->next here because that will make the fucntion skip the last element
         cout << temp->data << "->";
         temp = temp->next;
     }
@@ -114,71 +109,87 @@ void Print() {
 
 void DeleteList() {
     // Free the allocated memory (optional, but good practice)
-    Node* temp1 = head;
-    while (temp1 != NULL) {
-        Node* next = temp1->next;
-        delete temp1;
-        temp1 = next;
+    Node* current = head;
+    while (current != nullptr) {
+        Node* next = current->next;
+        delete current;
+        current = next;
     }
+    head = nullptr;
+    tail = nullptr;
 }
 void InsertBeginning(int x) { // time complexity O(1)
-    Node* temp = new Node; // creates new node (remember there are two cases: empty list or 
-    temp->data = x; // populates
-    temp->next = head; // makes new node point to whatever head node was pointing to, which would be the first nod in the list 
-    head = temp; //makes head point to new node instead of first node in the list
+    Node* newNode = new Node; // creates new node (remember there are two cases: empty list or 
+    newNode->data = x; // populates
+    if (head == nullptr) { //edge case for if the list is empty 
+        head = tail = newNode;
+    }
+    else {
+        newNode->next = head; // makes new node point to whatever head node was pointing to, which would be the first nod in the list 
+        head = newNode; //makes head point to new node instead of first node in the list
+        }
 }
-void Insert_at_end(int x) { //time complexity O(n) - this is an apppend function
-    Node* temp = new Node; // create new node
-    temp->data = x;
-    temp->next = NULL;
+void Insert_at_end(int x) { //time complexity O(n) - this is an apppend function without using the tail
+    Node* newNode = new Node; // create new node
+    newNode->data = x;
+    newNode->next = nullptr;
 
     Node* temp1 = head;
-    while (temp1->next != NULL) { //traverse 
+    while (temp1->next != nullptr) { //traverse 
         temp1 = temp1->next;
     }
-    temp1->next = temp;
-    tail = temp;
+    temp1->next = newNode;
+    tail = newNode;
 }
 void Insert_at(int data, int n) { //time complexity O(n)
-    Node* temp1 = new Node; // make new node
-    temp1->data = data;
-    temp1->next = NULL;
-    if (n == 1) { // first case if we want to insert at beginning
-        temp1->next = head; //same code as insert at beginning
-        head = temp1;
+    if (n < 1) {
+        cout << "Invalid position!" << endl;
         return;
     }
-    Node* temp2 = head; // second case if it's not beginning
-    for (int i = 0; i < n - 2; i++) { // we want to travel to the (n-1)th node. Since we are already at head, we need the 
-        temp2 = temp2->next;          // loop to run (n-2) times
+    if (n == 1) {
+        InsertBeginning(data);
+        return;
     }
-    if (temp2 == tail) {
-        tail = temp1;
+    Node* newNode = new Node; // make new node
+    newNode->data = data;
+    newNode->next = nullptr;
+    Node* temp = head; // second case if it's not beginning
+    for (int i = 0; i < n - 2 && temp != nullptr; i++) { // we want to travel to the (n-1)th node. Since we are already at head, we need the 
+        temp = temp->next;          // loop to run (n-2) times
     }
-    temp1->next = temp2->next; // make new node point to the nth node. this is done first as we will lose this link if done later
-    temp2->next = temp1; // make (n-1)th node point to this new node
+    if (temp == nullptr) {
+        cout << "Position out of bounds!" << endl;
+        delete newNode;
+        return;
+    }
+    newNode->next = temp->next; // make new node point to the nth node. this is done first as we will lose this link if done later
+    temp->next = newNode; // make (n-1)th node point to this new node
+    
+    // Update tail if inserting at end
+    if (newNode->next == nullptr) {
+        tail = newNode;
+    }
 }
 
 void Append(int x) {
-    Node* temp = new Node;
-    temp->data = x;
-    temp->next = NULL;
+    Node* newNode = new Node;
+    newNode->data = x;
+    newNode->next = nullptr;
 
     if (head == nullptr) {
         // First node
-        head = temp;
-        tail = temp;
+        head = tail = newNode;
     }
     else {
-        tail->next = temp;
-        tail = temp;
+        tail->next = newNode;
+        tail = newNode;
     }
 }
 
 int ListLength() {
     Node* current = head;
     int count = 0;
-    while (current != NULL) {
+    while (current != nullptr) {
         count++;
         current = current->next;
     }
@@ -186,25 +197,41 @@ int ListLength() {
     return count;
 }
 void Delete_at(int n) {
-    Node* temp1 = head;
+    if (head == nullptr || n < 1) {
+        cout << "Invalid deletion!" << endl;
+        return;
+    }
+    Node* temp = head;
     if (n == 1) { //deletion at head
-        head = temp1->next; //fixes the link
-        delete temp1; //frees the memory by deleting the node
+        head = temp->next; //fixes the link
+        delete temp; //frees the memory by deleting the node
+        if (head == nullptr) {  // In case List became empty cause there was only 1 node
+            tail = nullptr;
+        }
         return;
     }
     for (int i = 0; i < n - 2; i++) {
-        temp1 = temp1->next; //temp1 points to (n-1)th node
+        temp = temp->next; //temp points to (n-1)th node
     }
-    Node* temp2 = temp1->next; //this is the nth node to be deleted
-    temp1->next = temp2->next; // temp1 now points to the next node temp2 is pointing at (n+1)th node. We have fixed the link
-    delete temp2; //freeing the memory by deleting the node    
+    if (temp->next == nullptr) {
+        cout << "Position out of bounds!" << endl;
+        return;
+    }
+    Node* nodeToDelete = temp->next; //this is the nth node to be deleted
+    temp->next = nodeToDelete->next; // temp now points to the next node temp is pointing at (n+1)th node. We have fixed the link
+    if (nodeToDelete == tail) { // Update tail if deleting last node
+        tail = temp;
+    }
+    delete nodeToDelete; //freeing the memory by deleting the node    
 }
 
 Node* ReverseIteratively(Node* head) { // Complexity O(n) 
+    if (head == nullptr) return nullptr;
     Node* current, * prev, * next;
+    tail = head; // Update tail to head
     current = head;
-    prev = NULL;
-    while (current != NULL) {
+    prev = nullptr;
+    while (current != nullptr) {
         next = current->next;  // next will be set to current->next always to keep track of what the next node is 
         current->next = prev;     //The current node's link is set to the previous node as we are trying to reverse the list. at the first iteration this will be NULL and this is correct
         prev = current;    // the previous node is set to current once the link has been adjusted
@@ -214,7 +241,7 @@ Node* ReverseIteratively(Node* head) { // Complexity O(n)
     return head;
 }
 void PrintForwardRecursion(Node* p) { //usually will take head as input
-    if (p == NULL) {  //base case 
+    if (p == NULL || p == nullptr) {  //base case 
         return;
     }
     cout << p->data << "->";
@@ -222,7 +249,7 @@ void PrintForwardRecursion(Node* p) { //usually will take head as input
 }
 
 void PrintBackwardRecursion(Node* p) {
-    if (p == NULL) {
+    if (p == NULL || p == nullptr) {
         return;
     }
     PrintBackwardRecursion(p->next); //uses the stack property by placing this statement before the print statement to print backwards. 
@@ -230,13 +257,14 @@ void PrintBackwardRecursion(Node* p) {
 
 }
 void ReverseRecursion(Node* current) {
-    if (current->next == NULL) {
+    if (current->next == nullptr) {
+        tail = head; 
         head = current;
         return;
     }
     ReverseRecursion(current->next);
     Node* q = current->next;
     q->next = current;
-    current->next = NULL;
+    current->next = nullptr;
 
 }
