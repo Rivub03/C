@@ -17,6 +17,8 @@ struct Node {
 };
 
 Node* head;
+Node* tail = NULL;
+
 
 void createBasicLinkedList(); //Linked List Basic Implementation of two nodes
 int ListLength();
@@ -30,6 +32,7 @@ void PrintForwardRecursion(Node*);
 void PrintBackwardRecursion(Node*);
 void ReverseRecursion(Node*);
 void DeleteList();
+void Append(int); // append function using tail pointer which will take O(1) time
 
 int main() {
 
@@ -52,7 +55,14 @@ int main() {
     PrintForwardRecursion(head); cout << endl;
     PrintBackwardRecursion(head); cout << endl;
     ReverseRecursion(head); Print();
+    ReverseRecursion(head); Print();
+    Append(7); Print();
+    Insert_at_end(8); Print();
+    Append(9); Print();
+    Insert_at(10, 10); Print();
+    Append(11); Print();
     DeleteList(); cout << head << "->" << head->data;
+
 
 
     return 0;
@@ -71,6 +81,7 @@ void createBasicLinkedList() {
     temp = new Node;
     temp->data = 4;
     temp->next = NULL;
+    tail = temp;
 
     // Find the last node and link the new node to the end of the list
     Node* temp1 = head;
@@ -78,6 +89,7 @@ void createBasicLinkedList() {
         temp1 = temp1->next; //traverses the entire list and reaches the last node 
     }
     temp1->next = temp;
+    tail = temp1->next;
 
     // Print the entire linked list
     temp1 = head;
@@ -125,7 +137,7 @@ void Insert_at_end(int x) { //time complexity O(n) - this is an apppend function
         temp1 = temp1->next;
     }
     temp1->next = temp;
-
+    tail = temp;
 }
 void Insert_at(int data, int n) { //time complexity O(n)
     Node* temp1 = new Node; // make new node
@@ -140,8 +152,27 @@ void Insert_at(int data, int n) { //time complexity O(n)
     for (int i = 0; i < n - 2; i++) { // we want to travel to the (n-1)th node. Since we are already at head, we need the 
         temp2 = temp2->next;          // loop to run (n-2) times
     }
+    if (temp2 == tail) {
+        tail = temp1;
+    }
     temp1->next = temp2->next; // make new node point to the nth node. this is done first as we will lose this link if done later
     temp2->next = temp1; // make (n-1)th node point to this new node
+}
+
+void Append(int x) {
+    Node* temp = new Node;
+    temp->data = x;
+    temp->next = NULL;
+
+    if (head == nullptr) {
+        // First node
+        head = temp;
+        tail = temp;
+    }
+    else {
+        tail->next = temp;
+        tail = temp;
+    }
 }
 
 int ListLength() {
