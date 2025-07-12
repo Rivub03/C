@@ -54,14 +54,16 @@ int main() {
     Insert_at_end(6); Print();
     PrintForwardRecursion(head); cout << endl;
     PrintBackwardRecursion(head); cout << endl;
-    ReverseRecursion(head); Print();
-    ReverseRecursion(head); Print();
+    if (head != nullptr) {
+        ReverseRecursion(head); Print();
+        ReverseRecursion(head); Print();
+    }
     Append(7); Print();
     Insert_at_end(8); Print();
     Append(9); Print();
     Insert_at(10, 10); Print();
     Append(11); Print();
-    DeleteList(); cout << head << "->" << head->data;
+    DeleteList(); cout << "List deleted successfully!" << endl;
 
 
 
@@ -79,15 +81,15 @@ void createBasicLinkedList() {
     head = temp;
 
     // Create the second node
-    Node *second = new Node;
+    Node* second = new Node;
     second->data = 4;
     second->next = nullptr;
-    head->next = second; 
+    head->next = second;
     tail = second;
-    
+
 
     // Print the entire linked list
-    Node *temp1 = head;
+    Node* temp1 = head;
     while (temp1 != nullptr) { // the previous while loop will need to be run again to print the last node. This is because in the temp->next loop, the loop will go to the last node and immediately exit. 
         cout << temp1->data << " "; // this problem could've been overcome by having this line below temp = temp->next
         temp1 = temp1->next;        // but that would make us skip the first element
@@ -127,7 +129,7 @@ void InsertBeginning(int x) { // time complexity O(1)
     else {
         newNode->next = head; // makes new node point to whatever head node was pointing to, which would be the first nod in the list 
         head = newNode; //makes head point to new node instead of first node in the list
-        }
+    }
 }
 void Insert_at_end(int x) { //time complexity O(n) - this is an apppend function without using the tail
     Node* newNode = new Node; // create new node
@@ -164,7 +166,7 @@ void Insert_at(int data, int n) { //time complexity O(n)
     }
     newNode->next = temp->next; // make new node point to the nth node. this is done first as we will lose this link if done later
     temp->next = newNode; // make (n-1)th node point to this new node
-    
+
     // Update tail if inserting at end
     if (newNode->next == nullptr) {
         tail = newNode;
@@ -249,7 +251,7 @@ void PrintForwardRecursion(Node* p) { //usually will take head as input
 }
 
 void PrintBackwardRecursion(Node* p) {
-    if (p == NULL || p == nullptr) {
+    if (p == nullptr) {
         return;
     }
     PrintBackwardRecursion(p->next); //uses the stack property by placing this statement before the print statement to print backwards. 
@@ -258,7 +260,7 @@ void PrintBackwardRecursion(Node* p) {
 }
 void ReverseRecursion(Node* current) {
     if (current->next == nullptr) {
-        tail = head; 
+        tail = head;
         head = current;
         return;
     }
@@ -266,5 +268,4 @@ void ReverseRecursion(Node* current) {
     Node* q = current->next;
     q->next = current;
     current->next = nullptr;
-
 }
