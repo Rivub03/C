@@ -12,143 +12,224 @@ struct Node {
 };
 
 Node* head;
+Node* tail;
 
 Node* GetNewNode(int x) { // just creates a new node and returns it with no populated fields
-    Node* newNode = new Node; 
+    Node* newNode = new Node;
     newNode->data = x;
-    newNode->prev = NULL;
-    newNode->next = NULL;
+    newNode->next = nullptr;
+    newNode->prev = nullptr;
     return newNode;
 }
 
 void InsertAtHead(int);
-void InsertAtTail(int);
-void Print();
-void ReversePrint();
+void InsertAtTail(int); //appends by traversing the entire list O(n)
+void Append(int); // appends using tail pointer O(1)
+void PrintForward();
+void PrintBackward(); // prints backward by traversing to the end of the list O(n) 
+void PrintBackwardTail(); // prints backward by using tail pointer O(n) 
 void Insert_at(int, int);
 void Delete_at(int);
-
+void DeleteList();
+int ListLength();
 
 int main()
 {
-    head = NULL;
+    Node* newNode = GetNewNode(2); // creates a node 
+    head = newNode; // createsa DLL of one node
 
-    InsertAtHead(2); Print(); ReversePrint();
-    InsertAtHead(4); Print(); ReversePrint();
-    InsertAtTail(8); Print(); ReversePrint();
-    Insert_at(7, 2); Print(); ReversePrint();
-    Insert_at(10, 5); Print(); ReversePrint();
-    Insert_at(12, 1); Print(); ReversePrint();
-    Delete_at(3); Print();
-    Delete_at(5); Print();
-    Delete_at(4); Print();
-    Delete_at(1); Print();
+    Node* secondNode = GetNewNode(3); //creates a DLL of two nodes
+    newNode->next = secondNode;
+    secondNode->prev = newNode;
+    tail = secondNode;
 
+    PrintForward();
+    PrintBackward();
+    PrintBackwardTail();
+    InsertAtHead(1); PrintForward();
+    InsertAtTail(4); PrintForward();
+    Append(6); PrintForward();
+    Insert_at(0, 1); PrintForward();
+    Insert_at(5, 6); PrintForward();
+    Insert_at(8, 8); PrintForward();
+    Insert_at(7, 8); PrintForward();
+    Delete_at(1); PrintForward();
+    Delete_at(8); PrintForward();
+    Insert_at(10, 4); PrintForward(); Delete_at(4); PrintForward();
+    PrintBackward(); PrintBackwardTail();
+    cout << "Length of list = " << ListLength();
+    DeleteList();
     return 0;
 }
 
-void InsertAtHead(int x) {
-    Node* temp = head; 
-    Node* newNode = GetNewNode(x); //pointer to structure since we are dynamically allocating memory for a node
-    if (head == NULL) {
-        head = newNode; //if list is empty head will point to this new node which will be first node
-        return;
-    }
-    head->prev = newNode; // adjusting the previous link of the first node 
-    newNode->next = head; // making newnode point to the previously first node, making it the second node
-    head = newNode; // making head point to this newnode, making it the first node
 
-}
-void InsertAtTail(int x) { 
-    Node* temp = head;  //very easy append function
-    Node* newNode = GetNewNode(x);
-    if (head == NULL) {
-        head = newNode;
-        return;
-    }
-    while (temp->next != NULL) { //travels to the last node and stops
-        temp = temp->next; 
-    }
-    temp->next = newNode; // newNode becomes last node
-    newNode->prev = temp; 
-}
-void Print() {
-    Node* temp = head;
-    cout << "Forward: " << endl;
-    while (temp != NULL) {
+
+void PrintForward() {
+    Node* temp;
+    temp = head;
+    cout << "DLL forward: head->";
+    while (temp != nullptr) {
         cout << temp->data << "<->";
+        if (temp == tail) {
+            cout << "tail";
+        }
         temp = temp->next;
     }
-    cout << "NULL" << endl;
+    cout << endl;
 }
-void ReversePrint() {
-    Node* temp = head;
-    if (temp == NULL) return;
-    while (temp->next != NULL) {
+
+void PrintBackward() {
+    Node* temp;
+    temp = head;
+    while (temp->next != nullptr) {
         temp = temp->next;
     }
-    cout << "Reverse: " << endl;
-    while (temp != NULL) {
+    cout << "DLL backward: tail->";
+    while (temp != nullptr) {
         cout << temp->data << "<->";
+        if (temp == head) {
+            cout << "head";
+        }
         temp = temp->prev;
     }
-    cout <<"NULL" << endl;
+    cout << endl;
 }
 
-void Insert_at(int newElement, int position) {
-    Node* newNode = GetNewNode(newElement);
-    if (position == 1) { //if we are inserting at head 
-        newNode->next = head;
-        head->prev = newNode;
-        head = newNode;
+void PrintBackwardTail() {
+    Node* temp;
+    temp = tail;
+    cout << "DLL backward: tail->";
+    while (temp != nullptr) {
+        cout << temp->data << "<->";
+        if (temp == head) {
+            cout << "head";
+        }
+        temp = temp->prev;
+
+    }
+    cout << endl;
+
+}
+
+void InsertAtHead(int x) {
+    Node* newNode = GetNewNode(x);
+    if (head == nullptr) {
+        head = tail = newNode; //if list is empty head will point to this new node which will be first node
+        return;
+    }
+    newNode->next = head;  // making newnode point to the previously first node, making it the second node
+    head->prev = newNode; // adjusting the previous link of the first node 
+    head = newNode; // making head point to this newnode, making it the first node
+}
+void InsertAtTail(int x) {
+    Node* newNode = GetNewNode(x);
+    Node* temp = head;
+    if (head == NULL) {
+        head = tail = newNode;
+        return;
+    }
+    while (temp->next != nullptr) { //travels to the last node and stops
+        temp = temp->next;
+    }
+    temp->next = newNode; // newNode becomes last node
+    newNode->prev = temp;
+    tail = newNode;
+}
+void Append(int x) {
+    Node* newNode = GetNewNode(x);
+    if (head == NULL) {
+        head = tail = newNode;
+        return;
+    }
+    newNode->prev = tail;
+    tail->next = newNode;
+    tail = newNode;
+}
+void Insert_at(int x, int n) {
+    if (n <= 0) {
+        cout << "Invalid Postion!" << endl;
+        return;
+    }
+    else if (n == 1) { //if we are inserting at head 
+        InsertAtHead(x);
+        return;
     }
     else { //if we are not inserting at head. This else block is important or else we'll have an infinite loop since 1-2 =-1 
         Node* temp = head;
-        for (int i = 0; i < position - 2; i++) {
+        for (int i = 0; i < n - 2 && temp != nullptr; i++) { // travel to the (n-1)th node
             temp = temp->next;
         }
-        newNode->next = temp->next;
-        newNode->prev = temp;
-        temp->next = newNode;
-        if (newNode->next != NULL) { //if we are inserting at tail, this won't apply
-            newNode->next->prev = newNode; //fixing the link of the next node to point to the previous node 
-        }
-    }
-}
-
-void Delete_at(int position) {
-    if (position == 1 && head != NULL) { // Deleting the head node
-        Node* nodetoDelete = head;
-        head = head->next; // Move head to the next node
-        delete nodetoDelete;
-        if (head != NULL) { // If the list isn't empty after deletion
-            head->prev = NULL; // Set the new head's previous link to NULL
-        }
-    }
-    else { //if we are not deleting at head
-        Node* temp = head;
-        for (int i = 1; i < position - 1; i++) { // Travel to the (position-1)th node
-            if (temp == NULL || temp->next == NULL) { // Check for out-of-bounds positions
-                cout << "Position out of bounds." << endl;
-                return;
-            }
-            temp = temp->next;
-        }
-
-        Node* nodeToDelete = temp->next; // Target node to delete
-
-        if (nodeToDelete == NULL) { // If position is beyond the list's length
-            cout << "Position out of bounds." << endl;
+        if (temp == nullptr) {
+            cout << "Position out of bounds!" << endl;
             return;
         }
-
-        temp->next = nodeToDelete->next; // Bypass the node to be deleted
-
-        if (nodeToDelete->next != NULL) { // If we're not at the end. This handles the unique case of deleting at the end
-            nodeToDelete->next->prev = temp; // where the next node's previous link will point to the node before the node to be deleted. 
+        else if (temp == tail) { // if we are appending or inserting at the end 
+            Append(x);
+            return;
         }
-
-        delete nodeToDelete; // Free the memory of the deleted node
+        else { // if we are inserting in the middle 
+            Node* newNode = GetNewNode(x);
+            newNode->next = temp->next; //making newnode point to the next node
+            newNode->prev = temp; //making newnode point to the previous node
+            temp->next->prev = newNode; //making next node point to newnode
+            temp->next = newNode; //making previous node point to newnode
+        }
     }
 }
-
+void Delete_at(int n) {
+    if (head == nullptr || n <= 0) {
+        cout << "Invalid Deletion!" << endl;
+        return;
+    }
+    else if (n == 1) { // Deleting the head node
+        Node* nodeToDelete = head;
+        head = head->next; // Move head to the next node
+        if (head != nullptr) { // If the list isn't empty after deletion
+            head->prev = nullptr; // Set the new head's previous link to NULL
+        }
+        else {
+            tail = nullptr;  // List became empty
+        }
+        delete nodeToDelete;
+        return;
+    }
+    else { // if we are not deleting at head
+        Node* temp = head;
+        for (int i = 0; i < n - 2 && temp != nullptr; i++) { // travel to the (n-1)th node
+            temp = temp->next;
+        }
+        if (temp == nullptr || temp->next == nullptr) { // Check for out-of-bounds positions
+            cout << "Out of bounds!" << endl;
+            return;
+        }
+        else if (temp->next == tail) { // if we are deleting the last node
+            delete temp->next;
+            temp->next = nullptr;
+            tail = temp;
+        }
+        else { // if we are deleting a node in the middle
+            Node* nodeToDelete = temp->next; // target node to delete
+            temp->next->next->prev = temp; // bypassing node to delete, fixing the previous link of the next node
+            temp->next = temp->next->next; // bypassing node to delete, fixing next node of the previous node
+            delete nodeToDelete; // free memory
+        }
+    }
+}
+void DeleteList() {
+    Node* current = head;
+    while (current != nullptr) {
+        Node* next = current->next;
+        delete current;
+        current = next;
+    }
+    head = tail = nullptr;
+}
+int ListLength() {
+    int count = 0;
+    Node* temp = head;
+    while (temp != nullptr) {
+        count++;
+        temp = temp->next;
+    }
+    return count;
+}
