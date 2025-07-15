@@ -30,6 +30,7 @@ void InsertAtEnd(int);
 void InsertAt(int, int);
 void DeleteAt(int);
 void DeleteList();
+bool IsCircular(); // checks if list is circular or not 
 
 int main() {
     Node* first = new Node(2);
@@ -55,6 +56,12 @@ int main() {
     DeleteAt(0); DeleteAt(9); PrintList();
     cout << "Length of list: " << ListLength() << endl;
     DeleteList(); PrintList();
+    if (IsCircular) {
+        cout << "Linked list is circular" << endl;
+    }
+    else {
+        cout << "Linked list is not circular" << endl;
+    }
 
 
     return 0;
@@ -124,17 +131,17 @@ void InsertAt(int data, int position) {
         InsertAtHead(data);
         return;
     }
-    Node* newNode = new Node(data); // make new node
     Node* current = head; // second case if it's not beginning
-    for (int i = 0; i < position - 2 && current->next != head; i++) { // we want to travel to the (n-1)th node. Since we are already at head, we need the 
-        current = current->next;          // loop to run (n-2) times
+    // Traverse to (position - 1)th node, unless we wrap around
+    for (int i = 0; i < position - 2 && current->next != head; i++) {
+        current = current->next;
     }
     if (current == tail || current->next == head) { // if we are at the last node
-        delete newNode;
         InsertAtEnd(data);
         return;
     }
     else {
+        Node* newNode = new Node(data); // make new node
         newNode->next = current->next; // make new node point to the nth node. this is done first as we will lose this link if done later
         current->next = newNode; // make (n-1)th node point to this new node
     }
@@ -151,16 +158,16 @@ void DeleteAt(int position) {
         nodeToDelete->next = nullptr;
         delete nodeToDelete;
     }
-    else {
+    else { // not deleting at head 
         Node* temp = head;
-        for (int i = 0; i < (position - 2); i++) {
+        for (int i = 0; i < (position - 2); i++) { // travel to the (n-1)th node
             temp = temp->next;
         }
-        Node* nodeToDelete = temp->next;
+        Node* nodeToDelete = temp->next; // target the node to delete
         if (temp->next == tail) { // if we are deleting the last node
             temp->next = head;
             nodeToDelete->next = nullptr;
-            tail = temp;
+            tail = temp; // tail needs to be updated
         }
         else {
             temp->next = temp->next->next;
@@ -171,17 +178,24 @@ void DeleteAt(int position) {
 }
 
 void DeleteList() {
+    if (head == nullptr) return;
+
+    tail->next = nullptr; // break the circular link
     Node* current = head;
-    Node* next;
-    tail->next = nullptr;
-    while (current != NULL || current != nullptr) {
-        next = current->next;
+    while (current != nullptr) {
+        Node* next = current->next;
         delete current;
         current = next;
-
     }
+
     head = nullptr;
     tail = nullptr;
-    delete current;
-
+}
+bool IsCircular() {
+    if (head == nullptr) return false;
+    Node* temp = head->next;
+    while (temp != nullptr && temp != head) { // travels to the head node if circular 
+        temp = temp->next;
+    }
+    return temp == head; //temp will be head if circular, won't be head if not circular
 }
