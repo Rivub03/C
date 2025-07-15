@@ -31,6 +31,7 @@ void InsertAt(int, int);
 void DeleteAt(int);
 void DeleteList();
 bool IsCircular(); // checks if list is circular or not 
+void PrintRecursion(Node*);
 
 int main() {
     Node* first = new Node(2);
@@ -55,13 +56,15 @@ int main() {
     DeleteAt(7); PrintList();
     DeleteAt(0); DeleteAt(9); PrintList();
     cout << "Length of list: " << ListLength() << endl;
-    DeleteList(); PrintList();
     if (IsCircular) {
         cout << "Linked list is circular" << endl;
     }
     else {
         cout << "Linked list is not circular" << endl;
     }
+    PrintRecursion(head);
+    DeleteList(); PrintList();
+
 
 
     return 0;
@@ -198,4 +201,12 @@ bool IsCircular() {
         temp = temp->next;
     }
     return temp == head; //temp will be head if circular, won't be head if not circular
+}
+
+void PrintRecursion(Node* temp) {
+    static bool visitedHead = false;
+    if (temp == head && visitedHead) return; // Terminate recursion when back at head
+    visitedHead = true;
+    cout << temp->data << "->";
+    PrintRecursion(temp->next);
 }
