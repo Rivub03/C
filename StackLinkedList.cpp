@@ -12,8 +12,8 @@ struct Node {
 
 // Global top pointer for the stack (as per your original design)
 // For a more robust and reusable stack, this would ideally be
-// a member of a Stack struct/class.
-Node* top = nullptr; // Initialize to nullptr, indicating an empty stack
+// a member of a Stack struct/class. Encapsulate if more than one stack needed!
+Node* top = nullptr; // Initialize to nullptr, indicating an empty stack. 
 
 // Function Prototypes
 void push(int);
