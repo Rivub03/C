@@ -49,7 +49,7 @@ struct QueueArray {
     }
 
     int GetSize() {
-        return this->rear + 1;
+        return this->rear - this->front;
     }
 
     bool IsFull() {
@@ -97,6 +97,7 @@ int main() {
     Q->EnQueue(90); Q->PrintQueue();
     Q->EnQueue(100); Q->PrintQueue();
     Q->EnQueue(110); Q->PrintQueue();
+    cout << "Size of Queue: " << Q->GetSize() << endl;
 
     cout << "Front of Queue: " << Q->Front() << endl;
     cout << "Rear of Queue: " << Q->Rear() << endl;
@@ -105,10 +106,14 @@ int main() {
     Q->DeQueue(); Q->PrintQueue();
     cout << "Front of Queue: " << Q->Front() << endl;
     cout << "Rear of Queue: " << Q->Rear() << endl;
+    cout << "Size of Queue: " << Q->GetSize() << endl;
     Q->EnQueue(5); Q->PrintQueue();
+    cout << "Size of Queue: " << Q->GetSize() << endl;
     Q->DeQueue(); Q->PrintQueue();
     Q->DeQueue(); Q->PrintQueue();
+    cout << "Size of Queue: " << Q->GetSize() << endl;
     Q->DeQueue(); Q->PrintQueue();
+    cout << "Size of Queue: " << Q->GetSize() << endl;
     Q->DeQueue(); Q->PrintQueue();
     Q->DeQueue(); Q->PrintQueue();
     Q->DeQueue(); Q->PrintQueue();
@@ -117,9 +122,12 @@ int main() {
     Q->DeQueue(); Q->PrintQueue();
     cout << "Front of Queue: " << Q->Front() << endl;
     cout << "Rear of Queue: " << Q->Rear() << endl;
+    cout << "Size of Queue: " << Q->GetSize() << endl;
     Q->EnQueue(20); Q->PrintQueue();
+    cout << "Size of Queue: " << Q->GetSize() << endl;
     delete Q;
     Q->EnQueue(20); Q->PrintQueue();
+    cout << "Size of Queue: " << Q->GetSize() << endl;
 
 
     return 0;
