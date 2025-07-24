@@ -35,11 +35,6 @@ struct SimpleArrayQueue {
         count = 0;
     }
 
-    ~SimpleArrayQueue() {
-        delete[] array;
-        array = nullptr;
-    }
-
     bool IsEmpty() const { // Added const for consistency
         return count == 0;
     }
@@ -49,7 +44,7 @@ struct SimpleArrayQueue {
     }
 
     // Enqueue (adds to rear)
-    void Enqueue(const PQNode& node) { // Takes a const reference to PQNode
+    void EnQueue(const PQNode& node) { // Takes a const reference to PQNode
         if (IsFull()) {
             // In a multi-level PQ, this would ideally mean the whole PQ is "full"
             // or that this specific priority level is full.
@@ -64,7 +59,7 @@ struct SimpleArrayQueue {
     }
 
     // Dequeue (removes from front)
-    PQNode Dequeue() {
+    PQNode DeQueue() {
         if (IsEmpty()) {
             // This should ideally not happen if the MultiLevelPQ checks IsEmpty first.
             // Returns a sentinel in case it's called on an empty queue.
@@ -106,136 +101,98 @@ struct SimpleArrayQueue {
 };
 // The main Multi-Level Priority Queue structure
 struct MultiLevelPriorityQueue {
-    SimpleArrayQueue** priorityLevels; // Array of pointers to SimpleArrayQueue
-    int maxPriorityLevel;              // Max numerical priority value (e.g., if priorities are 0,1,2, then maxPrioLevel = 2)
-    int defaultQueueCapacity;          // Capacity for each individual SimpleArrayQueue
-    int totalElements;                 // Total elements across all queues
-
-    // Constructor
-    MultiLevelPriorityQueue(int numLevels, int queueCapacity) {
-        if (numLevels <= 0 || queueCapacity <= 0) {
+    SimpleArrayQueue** priorityQueues; // the 2D array that will alllow us to create the buckets
+    int maxPriority; // to keep track of the number of queues
+    int queueCapcity; // to keep track of the size of each queue
+    int totalElements; // to keep track of the total number of elements 
+    MultiLevelPriorityQueue(int numberOfQueues, int queueCapacity) {
+        if (numberOfQueues <= 0 || queueCapacity <= 0) {
             cout << "Error: Number of priority levels and queue capacity must be positive." << endl;
             // Handle error, perhaps throw exception or exit
-            maxPriorityLevel = 0;
-            defaultQueueCapacity = 0;
-            priorityLevels = nullptr;
-            totalElements = 0;
             return;
         }
-        maxPriorityLevel = numLevels - 1; // If 3 levels, max priority value is 2 (0, 1, 2)
-        defaultQueueCapacity = queueCapacity;
-        totalElements = 0;
-
-        // Dynamically allocate an array of SimpleArrayQueue pointers
-        priorityLevels = new SimpleArrayQueue * [numLevels];
-        // Initialize each pointer to a new SimpleArrayQueue
-        for (int i = 0; i < numLevels; ++i) {
-            priorityLevels[i] = new SimpleArrayQueue(defaultQueueCapacity);
+        // initializing members
+        maxPriority = numberOfQueues - 1;
+        this->queueCapcity = queueCapacity;
+        this->totalElements = 0;
+        // dynamically allocating the 2D array
+        priorityQueues = new SimpleArrayQueue * [numberOfQueues];
+        for (int i = 0; i < numberOfQueues; i++) {
+            priorityQueues[i] = new SimpleArrayQueue(queueCapacity);
         }
     }
-
-    // Destructor
     ~MultiLevelPriorityQueue() {
-        if (priorityLevels) {
-            for (int i = 0; i < maxPriorityLevel + 1; ++i) {
-                delete priorityLevels[i]; // Delete each individual SimpleArrayQueue object
+        if (priorityQueues) {
+            for (int i = 0; i <= maxPriority; i++) {
+                delete[] priorityQueues[i];
             }
-            delete[] priorityLevels;     // Delete the array of pointers itself
-            priorityLevels = nullptr;
+            delete[] priorityQueues;
+            priorityQueues = nullptr;
         }
     }
 
     bool IsEmpty() const {
         return totalElements == 0;
     }
-
     bool IsFull() const {
-        // A multi-level PQ is full if all its individual queues are full.
-        // Or if totalElements == maxCapacity (if you had a max capacity for the whole thing)
-        // This implementation considers it full if any attempt to enqueue would fail.
-        // It's more common to consider it full if all levels are full.
-        for (int i = 0; i <= maxPriorityLevel; ++i) {
-            if (!priorityLevels[i]->IsFull()) {
-                return false; // At least one level is not full
+        for (int i = 0; i <= maxPriority; i++) {
+            if (!priorityQueues[i]->IsFull()) {
+                return false;
             }
         }
-        return true; // All levels are full
+        return true;
     }
-
     int GetSize() const {
         return totalElements;
     }
-
-    // Enqueue: Adds an element to the appropriate priority queue level
-    void Enqueue(int value, int priority) {
-        // Validate priority
-        if (priority < 0 || priority > maxPriorityLevel) {
-            cout << "Error: Invalid priority " << priority << ". Must be between 0 and " << maxPriorityLevel << "." << endl;
+    void EnQueue(PQNode node) {
+        if (node.priority < 0 || node.priority > maxPriority) {
+            cout << "Error: Invalid priority " << node.priority << ". Must be between 0 and " << maxPriority << "." << endl;
             return;
         }
-
-        PQNode newNode(value, priority);
-        priorityLevels[priority]->Enqueue(newNode); // Enqueue into the specific priority level's queue
-
-        // Only increment totalElements if the enqueue into the sub-queue was successful
-        // (i.e., the sub-queue wasn't full). This requires checking the sub-queue's state
-        // or modifying SimpleArrayQueue::Enqueue to return a bool.
-        // For simplicity, we'll assume the sub-queue handles its overflow printing
-        // and just increment totalElements, implying if a sub-queue is full,
-        // it counts as an overflow for the whole system if no other action is taken.
-        // A more robust system would re-prioritize or handle it.
-        if (!priorityLevels[priority]->IsFull()) { // Check before adding. This is imperfect
-            // as Enqueue might already print overflow
-            totalElements++;
+        else if (IsFull()) {
+            cout << "Overflow! The entire multilevel queue is full! " << endl;
+        }
+        priorityQueues[node.priority]->EnQueue(node); // enqueueing into proper subqueue based on prioriy
+        if (!priorityQueues[node.priority]->IsFull()) { //checking if the subqueue is full or not
+            totalElements++; // only increment if element is inserted into subqueue; 
         }
     }
-
-    // Dequeue: Removes and returns the highest priority element (lowest numerical priority value)
-    PQNode Dequeue() {
+    PQNode DeQueue() {
         if (IsEmpty()) {
             cout << "Multi-Level Priority Queue Underflow! Cannot dequeue." << endl;
             return PQNode(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
         }
-
-        // Iterate from the highest priority level (0) to the lowest (maxPriorityLevel)
-        for (int i = 0; i <= maxPriorityLevel; ++i) {
-            if (!priorityLevels[i]->IsEmpty()) {
-                // Found a non-empty queue at this priority level
-                PQNode dequeuedNode = priorityLevels[i]->Dequeue();
+        PQNode deQueuedElement;
+        for (int i = 0; i <= maxPriority; i++) { // start with the highest priority subqueue and start dequeueing from front
+            if (!priorityQueues[i]->IsEmpty()) {
+                deQueuedElement = priorityQueues[i]->DeQueue(); // dequeue from that specific subqueue i
                 totalElements--;
-                cout << "Dequeued: " << dequeuedNode.data << " from priority level " << i << endl;
-                return dequeuedNode;
+                return deQueuedElement;
             }
         }
-
-        // This path should ideally not be reached if IsEmpty() check passes
         cout << "Error: No elements found despite totalElements > 0. (Logical error)" << endl;
         return PQNode(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     }
-
-    // Peek: Returns the highest priority element without removing it
     PQNode Peek() const {
         if (IsEmpty()) {
             cout << "Multi-Level Priority Queue is empty! No element to peek." << endl;
             return PQNode(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
         }
-
-        for (int i = 0; i <= maxPriorityLevel; ++i) {
-            if (!priorityLevels[i]->IsEmpty()) {
-                // Found the highest priority element
-                return priorityLevels[i]->Peek();
+        for (int i = 0; i <= maxPriority; i++) {
+            if (!priorityQueues[i]->IsEmpty()) {
+                // found the highest priority element 
+                return priorityQueues[i]->Peek();
             }
         }
-
         // Should not be reached
         return PQNode(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
     }
-
-    void PrintQueue() const {
-        cout << "Multi-Level PQ (Total " << totalElements << " elements):" << endl;
-        for (int i = 0; i <= maxPriorityLevel; ++i) {
-            cout << "  Priority " << i << ": ";
-            priorityLevels[i]->PrintQueue();
+    void PrintQueue() {
+        cout << "MultiLevevl Queue (Total Elements " << totalElements << "):" << endl;
+        for (int i = 0; i <= maxPriority; i++) {
+            cout << "Priority Queue " << i << ": ";
+            priorityQueues[i]->PrintQueue();
             cout << endl;
         }
     }
@@ -251,16 +208,16 @@ int main() {
     cout << "Is Empty? " << (mlpq.IsEmpty() ? "Yes" : "No") << ", Size: " << mlpq.GetSize() << endl;
 
     cout << "\n--- Enqueuing Elements ---" << endl;
-    mlpq.Enqueue(10, 2); // Value 10, Priority 2
-    mlpq.Enqueue(5, 0);  // Value 5, Priority 0 (highest)
-    mlpq.Enqueue(20, 1); // Value 20, Priority 1
-    mlpq.Enqueue(15, 2); // Value 15, Priority 2
-    mlpq.Enqueue(30, 0); // Value 30, Priority 0
-    mlpq.Enqueue(25, 1); // Value 25, Priority 1
-    mlpq.Enqueue(50, 0); // Value 50, Priority 0
-    mlpq.Enqueue(100, 1); // Value 100, Priority 1
-    mlpq.Enqueue(1, 2);  // Value 1, Priority 2
-    mlpq.Enqueue(99, 0); // Attempt to enqueue to P:0, which is now full (3 elements)
+    mlpq.EnQueue(PQNode(10, 2)); // Value 10, Priority 2
+    mlpq.EnQueue(PQNode(5, 0));  // Value 5, Priority 0 (highest)
+    mlpq.EnQueue(PQNode(20, 1)); // Value 20, Priority 1
+    mlpq.EnQueue(PQNode(15, 2)); // Value 15, Priority 2
+    mlpq.EnQueue(PQNode(30, 0)); // Value 30, Priority 0
+    mlpq.EnQueue(PQNode(25, 1)); // Value 25, Priority 1
+    mlpq.EnQueue(PQNode(50, 0)); // Value 50, Priority 0
+    mlpq.EnQueue(PQNode(100, 1)); // Value 100, Priority 1
+    mlpq.EnQueue(PQNode(1, 2));  // Value 1, Priority 2
+    mlpq.EnQueue(PQNode(99, 0)); // Attempt to enqueue to P:0, which is now full (3 elements)
 
     mlpq.PrintQueue();
     cout << "Is Empty? " << (mlpq.IsEmpty() ? "Yes" : "No") << ", Size: " << mlpq.GetSize() << endl;
@@ -268,44 +225,43 @@ int main() {
 
 
     cout << "\n--- Dequeuing Elements ---" << endl;
-    mlpq.Dequeue(); // Should get (5, P:0)
+    mlpq.DeQueue(); // Should get (5, P:0)
     mlpq.PrintQueue();
-    mlpq.Dequeue(); // Should get (30, P:0)
+    mlpq.DeQueue(); // Should get (30, P:0)
     mlpq.PrintQueue();
-    mlpq.Dequeue(); // Should get (50, P:0)
+    mlpq.DeQueue(); // Should get (50, P:0)
     mlpq.PrintQueue();
-    mlpq.Dequeue(); // Should get (20, P:1)
+    mlpq.DeQueue(); // Should get (20, P:1)
     mlpq.PrintQueue();
-    mlpq.Dequeue(); // Should get (25, P:1)
+    mlpq.DeQueue(); // Should get (25, P:1)
     mlpq.PrintQueue();
-    mlpq.Dequeue(); // Should get (100, P:1)
+    mlpq.DeQueue(); // Should get (100, P:1)
     mlpq.PrintQueue();
-    mlpq.Dequeue(); // Should get (10, P:2)
+    mlpq.DeQueue(); // Should get (10, P:2)
     mlpq.PrintQueue();
-    mlpq.Dequeue(); // Should get (15, P:2)
+    mlpq.DeQueue(); // Should get (15, P:2)
     mlpq.PrintQueue();
-    mlpq.Dequeue(); // Should get (1, P:2)
+    mlpq.DeQueue(); // Should get (1, P:2)
     mlpq.PrintQueue();
 
     cout << "\n--- After Dequeuing All ---" << endl;
-    mlpq.Dequeue(); // Should be underflow
+    mlpq.DeQueue(); // Should be underflow
     mlpq.PrintQueue();
     cout << "Is Empty? " << (mlpq.IsEmpty() ? "Yes" : "No") << ", Size: " << mlpq.GetSize() << endl;
 
     // Test enqueuing after emptying
-    mlpq.Enqueue(77, 1);
-    mlpq.Enqueue(88, 0);
+    mlpq.EnQueue(PQNode(77, 1));
+    mlpq.EnQueue(PQNode(88, 0));
     mlpq.PrintQueue();
     cout << "Peek: " << mlpq.Peek().data << endl;
 
-    //delete mlpq.priorityLevels[0]; // Example of manual deletion from main if not using Destructor
+    //delete mlpq.priorityQueues[0]; // Example of manual deletion from main if not using Destructor
     // Make sure to use 'delete mlpq' to call its destructor and free all memory correctly.
     //delete& mlpq; // Correct way to delete a dynamically allocated object, if it was newed.
     // However, mlpq is on the stack in this main, so no 'delete &mlpq' needed.
     // If you had `MultiLevelPriorityQueue* mlpq_ptr = new MultiLevelPriorityQueue(...)`
     // then you would `delete mlpq_ptr;`.
-// The current main function creates `mlpq` on the stack, so its destructor is called automatically.
+    // The current main function creates `mlpq` on the stack, so its destructor is called automatically.
 
     return 0;
 }
-
