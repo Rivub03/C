@@ -15,14 +15,25 @@ struct Node {
 	int count;
 	Node* left;
 	Node* right;
-	Node() : data(), left(), right() {}; //default constructor
+	// default constructor explicitly initializes pointers to nullptr
+	Node() : data(0), count(0), left(nullptr), right(nullptr) {};
 	Node(int data) {
 		this->data = data;
+		this->count = 1; // Initialize count to 1 for a new node
 		this->left = this->right = nullptr;
 	}
 };
+
 struct BinarySearchTree {
 	Node* root;
+
+	BinarySearchTree() {
+		root = nullptr;
+	}
+	// Helper function for a user-facing Insert
+	void Insert(int data) {
+		root = Insert(root, data);
+	}
 
 	// Complexity O(h) where h is height of tree 
 	Node* Insert(Node* root, int data) {
@@ -44,36 +55,33 @@ struct BinarySearchTree {
 
 	bool Search(Node* root, int data) { //searches the tree and returns true/false
 		// O(h) since it visits each level only once
+		if (root == nullptr) {
+			return false;
+		}
 		if (data == root->data) {
 			return true;
 		}
-		else if (root == nullptr) {
-			return false;
-		}
 		else if (data < root->data) {
-			Search(root->left, data);
+			return Search(root->left, data); // Return the result of the recursive call
 		}
-		else if (data > root->data) {
-			Search(root->right, data);
-		}
-		else {
-			return false;
+		else { // data > root->data
+			return Search(root->right, data); // Return the result of the recursive call
 		}
 	}
 
 	Node* Find(Node* root, int value) { //finds a node and returns the node
 		if (root == nullptr) {
-			cout << "Node/Value not found!" << endl;
+			cout << "Node/value not found!" << endl;
 			return nullptr;
 		}
-		else if (root->data == value) {
+		if (root->data == value) {
 			return root;
 		}
 		else if (value > root->data) {
-			Find(root->right, value);
+			return Find(root->right, value); // Return the result
 		}
-		else if (value < root->data) {
-			Find(root->left, value);
+		else { // value < root->data
+			return Find(root->left, value); // Return the result
 		}
 	}
 
@@ -104,6 +112,9 @@ struct BinarySearchTree {
 	}
 
 	bool isBSTUtil(Node* root, int min, int max) { // utility function for isBinary Search Tree
+		if (root == nullptr) { // Added base case
+			return true;
+		}
 		if (root->data > min && root->data < max &&
 			isBSTUtil(root->left, min, root->data) && isBSTUtil(root->right, root->data, max))
 		{ // O(n): Checks if left subtree and right subtree are BSTs recursively visiting each node once
@@ -136,13 +147,13 @@ struct BinarySearchTree {
 				root = root->right;
 				delete temp;
 			}
-			else if (root->right = nullptr) {
+			else if (root->right == nullptr) {
 				Node* temp = root;
 				root = root->left;
 				delete temp;
 
 			}
-			else if (root->right != nullptr && root->left != nullptr) { //case 3: Two children
+			else { //case 3: Two children
 				Node* temp = FindMin(root->right);
 				//we want the data & count field to only change to preserve all other links
 				root->data = temp->data;
@@ -156,6 +167,7 @@ struct BinarySearchTree {
 	}
 
 	void LevelOrder(Node* root) {
+		cout << "Level Order Traversal: ";
 		if (root == nullptr) {
 			return;
 		}
@@ -163,12 +175,12 @@ struct BinarySearchTree {
 		Q.push(root);
 		while (!Q.empty()) {
 			Node* current = Q.front();
-			cout << current->data << " ";
+			cout << current->data << "(" << current->count << ") ";
 			Q.pop();
 			if (current->left != nullptr) {
 				Q.push(current->left);
 			}
-			else if (current->right != nullptr) {
+			if (current->right != nullptr) {
 				Q.push(current->right);
 			}
 
@@ -180,7 +192,7 @@ struct BinarySearchTree {
 		if (root == nullptr) {
 			return;
 		}
-		cout << root->data << " ";
+		cout << root->data << "(" << root->count << ") ";
 		PreOrder(root->left);
 		PreOrder(root->right);
 	}
@@ -189,7 +201,7 @@ struct BinarySearchTree {
 			return;
 		}
 		InOrder(root->left);
-		cout << endl << root->data << " ";
+		cout << root->data << "(" << root->count << ") ";
 		InOrder(root->right);
 	}
 	void PostOrder(Node* root) {
@@ -198,11 +210,15 @@ struct BinarySearchTree {
 		}
 		PostOrder(root->left);
 		PostOrder(root->right);
-		cout << endl << root->data << " ";
+		cout << root->data << "(" << root->count << ") ";
 	}
 
 	Node* GetSuccessor(Node* root, int value) {
 		Node* current = Find(root, value);
+		if (current == nullptr) { // Added check for non-existent node
+			cout << "Node does not exist!" << endl;
+			return nullptr;
+		}
 		if (current->right != nullptr) { // case 1: a right subtree exists
 			return FindMin(current->right); // return the minimum of right subtree
 		}
@@ -223,6 +239,10 @@ struct BinarySearchTree {
 	}
 	Node* GetPredecessor(Node* root, int value) {
 		Node* current = Find(root, value);
+		if (current == nullptr) { // Added check for non-existent node
+			cout << "Node does not exist!" << endl;
+			return nullptr;
+		}
 		if (current->left != nullptr) { // case 1: There is a left subtree
 			return FindMax(current->left);
 		}
@@ -275,7 +295,61 @@ int main() {
 	bst.root = bst.Insert(bst.root, 78);
 	bst.root = bst.Insert(bst.root, 72);
 	bst.root = bst.Insert(bst.root, 71);
+	// deleting nodes
+	bst.LevelOrder(bst.root);
+	bst.root = bst.Delete(bst.root, 71);
+	bst.LevelOrder(bst.root);
+	bst.root = bst.Delete(bst.root, 70);
+	bst.LevelOrder(bst.root);
+	bst.root = bst.Delete(bst.root, 100);
+	bst.LevelOrder(bst.root);
 
+	cout << "Minimum is: " << bst.FindMin(bst.root)->data << endl;
+	cout << "Maximum is: " << bst.FindMax(bst.root)->data << endl;
+	cout << "Root Node is: " << bst.root->data << endl;
+	cout << "Height of the tree is: " << bst.FindHeight(bst.root) << endl;
+	cout << "Pre-order traversal: ";
+	bst.PreOrder(bst.root);
+	cout << endl;
+	cout << "In-Order Traversal: ";
+	bst.InOrder(bst.root);
+	cout << endl;
+	cout << "Post-order Traversal: ";
+	bst.PostOrder(bst.root);
+	cout << endl;
+	cout << "Whether Binary Tree is Binary Search Tree: ";
+	if (bst.IsBinarySearchTree(bst.root)) cout << "true";
+	else cout << "false";
+	cout << endl;
+	int a;
+	cout << "Enter number to search data and to find its successor and predecessor: ";
+	cin >> a;
+	if (bst.Search(bst.root, a)) cout << "Found" << endl;
+	else cout << "Not found" << endl;
+	Node* b = bst.GetSuccessor(bst.root, a);
+	Node* c = bst.GetPredecessor(bst.root, a);
+	cout << "Successor is: " << b->data << "\tPredecessor is: " << c->data << endl;
+
+	bst.root = bst.Insert(bst.root, 20);
+	bst.root = bst.Insert(bst.root, 65);
+	bst.root = bst.Insert(bst.root, 50);
+	bst.LevelOrder(bst.root);
+	cout << "Pre-order traversal: ";
+	bst.PreOrder(bst.root);
+	cout << endl;
+	cout << "In-Order Traversal: ";
+	bst.InOrder(bst.root);
+	cout << endl;
+	cout << "Post-order Traversal: ";
+	bst.PostOrder(bst.root);
+	cout << endl;
+
+	bst.root = bst.Delete(bst.root, 65);
+	bst.LevelOrder(bst.root);
+	bst.root = bst.Delete(bst.root, 50);
+	bst.LevelOrder(bst.root);
+	bst.root = bst.Delete(bst.root, 50);
+	bst.LevelOrder(bst.root);
 
 
 
