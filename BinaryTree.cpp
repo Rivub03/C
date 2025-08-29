@@ -232,6 +232,10 @@ struct BinaryTree {
 	}
 };
 
+int SizeOfBinaryTree(Node*); // Finds the number of nodes (size) of the binary tree 
+int FindHeight(Node*); // finding height of the binary tree 
+int MaxSum(Node*); // finding which level has maximum sum
+Node* LCA(Node*, Node*, Node*); // finding the least common ancestor of a given pair of nodes 
 
 
 int main() {
@@ -271,7 +275,40 @@ int main() {
 	bt.PreOrder(bt.root);
 	cout << "\nPostOrder: " << endl;
 	bt.PostOrder(bt.root);
+
+	cout << "The size of the binary tree is: " << SizeOfBinaryTree(bt.root) << endl;
+	cout << "The height of the binary tree is: " << FindHeight(bt.root) << endl;
 	bt.DeleteTree(bt.root);
+
 
 	return 0;
 }
+
+int SizeOfBinaryTree(Node* root) {
+	if (root == nullptr) { //base case 
+		return 0;
+	}
+	return (SizeOfBinaryTree(root->left) + 1 + SizeOfBinaryTree(root->right));
+}
+int FindHeight(Node* root) { //Stack Trace the entire thing to understand
+	if (root == nullptr) {
+		return -1;
+	}
+	int leftDepth = FindHeight(root->left);
+	int rightDepth = FindHeight(root->right);
+	if (leftDepth > rightDepth) {
+		return (leftDepth + 1);
+	}
+	else {
+		return (rightDepth + 1);
+	}
+}
+/*
+int MaxSum(Node* root) {
+
+}
+
+Node* LCA(Node*, Node*, Node*) {
+
+}
+*/
