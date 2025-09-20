@@ -154,7 +154,7 @@ struct BinarySearchTree {
 
 			}
 			else { //case 3: Two children
-				Node* temp = FindMin(root->right);
+				Node* temp = FindMin(root->right); // find the in-order successor or the smallest in the right subtree
 				//we want the data & count field to only change to preserve all other links
 				root->data = temp->data;
 				root->count = temp->count;
